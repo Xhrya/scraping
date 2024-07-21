@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentiment by Theme</title>
+  </head>
+  <body>
+    <h1>Sentiment Analysis by Theme</h1>
+
+    <h2>Barclays Top 5 Topics</h2>
+    <ul>
+      {% for word, (polarity, subjectivity) in barclays_topic_sentiments.items()
+      %}
+      <li>
+        <strong>{{ word }}</strong><br />
+        Polarity: {{ polarity }} ({{ barclays_sentiment_meanings[word][0] }})<br />
+        Subjectivity: {{ subjectivity }} ({{
+        barclays_sentiment_meanings[word][1] }})
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h2>Non-Financial Report Top 5 Topics</h2>
+    <ul>
+      {% for word, (polarity, subjectivity) in
+      non_financial_topic_sentiments.items() %}
+      <li>
+        <strong>{{ word }}</strong><br />
+        Polarity: {{ polarity }} ({{ non_financial_sentiment_meanings[word][0]
+        }})<br />
+        Subjectivity: {{ subjectivity }} ({{
+        non_financial_sentiment_meanings[word][1] }})
+      </li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+create a virtual environtmnt: python3- m venv venv
+source venv/bin/activate
+ 
+ in the end, to disactive: deactivate

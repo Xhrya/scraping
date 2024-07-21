@@ -6,7 +6,7 @@ import base64
 from io import BytesIO
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
-from cm,ollections import Counter
+from collections import Counter
 import re
 from textblob import TextBlob
 import PyPDF2
@@ -110,7 +110,12 @@ def index():
     except Exception as e:
         print(f"An error occurred in index route: {e}")
         abort(500)  # Internal Server Error
-
+def analyze_pdf(file_path):
+    text = extract_text_from_pdf(file_path)
+    cleaned_text = clean_text(text)
+    top_topics = get_top_topics(cleaned_text)
+    polarity, subjectivity = perform_sentiment_analysis(cleaned_text)
+    return top_topics, polarity, subjectivity
 @app.route('/sentiment')
 def sentiment():
     try:

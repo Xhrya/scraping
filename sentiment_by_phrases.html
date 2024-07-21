@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentiment by Phrases</title>
+    <style>
+      .snippet {
+        cursor: pointer;
+        color: blue;
+        text-decoration: underline;
+      }
+      .full-text {
+        display: none;
+      }
+    </style>
+    <script>
+      function toggleText(id) {
+        var fullText = document.getElementById(id);
+        if (fullText.style.display === "none") {
+          fullText.style.display = "block";
+        } else {
+          fullText.style.display = "none";
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Sentiment Analysis of Phrases</h1>
+
+    <h2>Barclays Report</h2>
+    <ul>
+      {% for phrase, result in barclays_phrases_sentiments.items() %}
+      <li>
+        <strong>{{ phrase }}</strong><br />
+        Snippet:
+        <span class="snippet" onclick="toggleText('barclays-{{ loop.index }}')"
+          >View Snippet</span
+        ><br />
+        <div id="barclays-{{ loop.index }}" class="full-text">
+          Snippet: {{ result.text }}<br />
+        </div>
+        Polarity: {{ result.polarity }} ({{ result.polarity_meaning }})<br />
+        Subjectivity: {{ result.subjectivity }} ({{ result.subjectivity_meaning
+        }})
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h2>Non-Financial Report</h2>
+    <ul>
+      {% for phrase, result in non_financial_phrases_sentiments.items() %}
+      <li>
+        <strong>{{ phrase }}</strong><br />
+        Snippet:
+        <span
+          class="snippet"
+          onclick="toggleText('non-financial-{{ loop.index }}')"
+          >View Snippet</span
+        ><br />
+        <div id="non-financial-{{ loop.index }}" class="full-text">
+          Snippet: {{ result.text }}<br />
+        </div>
+        Polarity: {{ result.polarity }} ({{ result.polarity_meaning }})<br />
+        Subjectivity: {{ result.subjectivity }} ({{ result.subjectivity_meaning
+        }})
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h2>Visualizations</h2>
+    <h3>Barclays Report</h3>
+    <img
+      src="data:image/png;base64,{{ barclays_polarity_chart }}"
+      alt="Barclays Polarity Chart"
+    />
+    <img
+      src="data:image/png;base64,{{ barclays_subjectivity_chart }}"
+      alt="Barclays Subjectivity Chart"
+    />
+
+    <h3>Non-Financial Report</h3>
+    <img
+      src="data:image/png;base64,{{ non_financial_polarity_chart }}"
+      alt="Non-Financial Polarity Chart"
+    />
+    <img
+      src="data:image/png;base64,{{ non_financial_subjectivity_chart }}"
+      alt="Non-Financial Subjectivity Chart"
+    />
+  </body>
+</html>

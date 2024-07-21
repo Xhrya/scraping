@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentiment Analysis</title>
+  </head>
+  <body>
+    <h1>Sentiment Analysis</h1>
+
+    <h2>Barclays Sentiment Analysis</h2>
+    <img
+      src="data:image/png;base64,{{ barclays_pie_chart }}"
+      alt="Barclays Sentiment Pie Chart"
+    />
+    <p>Polarity: {{ barclays_polarity }}</p>
+    <p>Subjectivity: {{ barclays_subjectivity }}</p>
+
+    <h2>Non-Financial Report Sentiment Analysis</h2>
+    <img
+      src="data:image/png;base64,{{ non_financial_pie_chart }}"
+      alt="Non-Financial Report Sentiment Pie Chart"
+    />
+    <p>Polarity: {{ non_financial_polarity }}</p>
+    <p>Subjectivity: {{ non_financial_subjectivity }}</p>
+
+    <a href="/">Back to Home</a>
+  </body>
+</html>
