@@ -3,50 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PDF Analysis</title>
+    <title>ESG Dashboard</title>
   </head>
   <body>
-    <h1>PDF Analysis</h1>
-
+    <h1>ESG Dashboard</h1>
     <h2>Barclays Word Cloud</h2>
     <img
       src="data:image/png;base64,{{ barclys_wordcloud }}"
       alt="Barclays Word Cloud"
     />
-    <h3>Top 10 Topics</h3>
-    <ul>
-      {% for word, count in barclys_top_words %}
-      <li>{{ word }}: {{ count }}</li>
-      {% endfor %}
-    </ul>
-    <h3>Sentiment Analysis</h3>
-    <p>Polarity: {{ barclys_polarity }}</p>
-    <p>Subjectivity: {{ barclys_subjectivity }}</p>
-
-    <h2>HBSC Word Cloud</h2>
+    <h2>HSBC Word Cloud</h2>
     <img
       src="data:image/png;base64,{{ hbsc_wordcloud }}"
-      alt="HBSC Word Cloud"
+      alt="HSBC Word Cloud"
     />
-    <h3>Top 10 Topics</h3>
-    <ul>
-      {% for word, count in hbsc_top_words %}
-      <li>{{ word }}: {{ count }}</li>
-      {% endfor %}
-    </ul>
-
-    <h2>Deutsche Bank Word Cloud</h2>
-    <img
-      src="data:image/png;base64,{{ db_wordcloud }}"
-      alt="Deutsche Bank Word Cloud"
-    />
-    <h3>Top 10 Topics</h3>
-    <ul>
-      {% for word, count in db_top_words %}
-      <li>{{ word }}: {{ count }}</li>
-      {% endfor %}
-    </ul>
-
-    <a href="/sentiment">View Sentiment Analysis Graphs</a>
+    <h2>DB Word Cloud</h2>
+    <img src="data:image/png;base64,{{ db_wordcloud }}" alt="DB Word Cloud" />
+    <!-- Add more content as needed -->
   </body>
 </html>

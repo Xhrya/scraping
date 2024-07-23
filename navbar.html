@@ -1,0 +1,52 @@
+<!-- templates/navbar.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ESG Dashboard</title>
+    <style>
+      /* Navbar styles */
+      nav {
+        background-color: blue;
+        padding: 10px;
+      }
+      .navbar-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50px;
+      }
+      .navbar-container ul {
+        list-style: none;
+        display: flex;
+        padding: 0;
+        margin: 0;
+      }
+      .navbar-container li {
+        margin: 0 10px;
+      }
+      .navbar-container a {
+        color: white;
+        text-decoration: none;
+      }
+      .navbar-container a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="navbar-container">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/scrape">Scrape</a></li>
+          <li><a href="/sentiment_by_theme">Sentiment by Theme</a></li>
+          <li><a href="/sentiment_by_phrases">Sentiment by Phrases</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+  </body>
+</html>

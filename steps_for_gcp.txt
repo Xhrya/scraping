@@ -1,0 +1,33 @@
+pip install google-cloud-storage
+
+
+call backedn APis from frontned:
+/get_pdf/<filename>
+
+-Update the URLs in your frontend to call the backend APIs for PDF retrieval.
+
+
+example update for detching PDFs:
+
+# Example AJAX call to fetch a PDF
+Example Update for Fetching PDFs:
+In your frontend code where you used to access the PDFs locally, update the URLs to point to the new backend endpoint.
+
+def fetch_pdf(filename):
+    response = fetch(f'/get_pdf/{filename}')
+    if response.ok:
+        return response.blob()
+    else:
+        print('Failed to fetch PDF')
+
+
+step 4:testing
+Ensure Google Cloud Storage Bucket Access:
+Verify that the backend can access the PDFs stored in the GCS bucket.
+
+Test Endpoints:
+Test the new API endpoints using tools like Postman or directly in the browser to ensure they are working as expected.
+
+Update Frontend:
+Make sure the frontend correctly displays or uses the PDFs retrieved from the backend.
+
