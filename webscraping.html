@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Scraping Results</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .wordcloud {
+        text-align: center;
+        margin: 20px 0;
+      }
+      .top-words {
+        margin: 20px 0;
+      }
+      .top-words h3 {
+        margin-bottom: 10px;
+      }
+      .top-words ul {
+        list-style: none;
+        padding: 0;
+      }
+      .top-words li {
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'navbar.html' %}
+
+    <div class="container">
+      <h1>Web Scraping Results</h1>
+
+      <!-- Barclays Word Cloud -->
+      <div class="wordcloud">
+        <h2>Barclays Word Cloud</h2>
+        <img
+          src="data:image/png;base64,{{ barclys_wordcloud }}"
+          alt="Barclays Word Cloud"
+        />
+      </div>
+
+      <!-- HSBC Word Cloud -->
+      <div class="wordcloud">
+        <h2>HSBC Word Cloud</h2>
+        <img
+          src="data:image/png;base64,{{ hbsc_wordcloud }}"
+          alt="HSBC Word Cloud"
+        />
+      </div>
+
+      <!-- DB Word Cloud -->
+      <div class="wordcloud">
+        <h2>DB Word Cloud</h2>
+        <img
+          src="data:image/png;base64,{{ db_wordcloud }}"
+          alt="DB Word Cloud"
+        />
+      </div>
+
+      <!-- Barclays Top Words -->
+      <div class="top-words">
+        <h2>Barclays Top Words</h2>
+        <ul>
+          {% for word, count in barclys_top_words %}
+          <li>{{ word }}: {{ count }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- HSBC Top Words -->
+      <div class="top-words">
+        <h2>HSBC Top Words</h2>
+        <ul>
+          {% for word, count in hbsc_top_words %}
+          <li>{{ word }}: {{ count }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- DB Top Words -->
+      <div class="top-words">
+        <h2>DB Top Words</h2>
+        <ul>
+          {% for word, count in db_top_words %}
+          <li>{{ word }}: {{ count }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

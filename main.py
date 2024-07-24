@@ -8,6 +8,11 @@ from flask import Flask, render_template, abort, request, jsonify
 import base64
 import sys
 from io import BytesIO
+import matplotlib
+matplotlib.use('Agg')  # Use 'Agg' backend for non-interactive plotting
+# from flask import Flask, send_from_directory
+
+
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from collections import Counter
@@ -28,6 +33,25 @@ from esg_scraper import scrape_data, get_top_words
 # Initialize the server with Flask and then use it for Dash
 server = Flask(__name__)
 app = Dash(__name__, server=server)
+# app = Flask(__name__, static_folder='static/frontend-react', static_url_path='')
+
+import os
+
+
+# @app.route('/')
+# def serve_react_app():
+#     return send_from_directory('static/frontend-react', 'index.html')
+
+
+# @app.route('/<path:path>')
+# def serve_static(path):
+#     return send_from_directory('static/frontend-react', path)
+
+
+file_path_barclys = '/Users/shreyapandey/lab-5/scraping/backend/data/Barclays-PLC-Annual-Report-2023.pdf'
+file_path_db = '/Users/shreyapandey/lab-5/scraping/backend/data/Non-Financial-Report-2023.pdf'
+
+
 
 # storage_client = storage.Client.from_service_account_json('path/to/your/service-account-key.json')
 # bucket_name = 'your-bucket-name'
@@ -90,72 +114,157 @@ def extract_text_from_pdf(file_path):
 # barclays_text = extract_text_from_pdf('../backend/files/Barclays-PLC-Annual-Report-2023.pdf')
 # non_financial_text = extract_text_from_pdf('../backend/files/Non-Financial-Report-2023.pdf')
 
-barclays_file_path = os.path.abspath('../backend/files/Barclays-PLC-Annual-Report-2023.pdf')
-non_financial_file_path = os.path.abspath('../backend/files/Non-Financial-Report-2023.pdf')
+# barclays_file_path = os.path.abspath('../backend/data/Barclays-PLC-Annual-Report-2023.pdf')
+# non_financial_file_path = os.path.abspath('../backend/data/Non-Financial-Report-2023.pdf')
 
-barclays_text = extract_text_from_pdf(barclays_file_path)
-non_financial_text = extract_text_from_pdf(non_financial_file_path)
+
+# Update with your actual file paths
+barclays_file_path = os.path.join(os.path.dirname(__file__), '/Users/shreyapandey/lab-5/scraping/backend/data/Barclays-PLC-Annual-Report-2023.pdf')
+non_financial_file_path = os.path.join(os.path.dirname(__file__), '/Users/shreyapandey/lab-5/scraping/backend/data/Barclays-PLC-Annual-Report-2023.pdf')
+
+# In-memory cache
+cache = {}
+
+def get_cached_pdf_text(file_path):
+    if file_path in cache:
+        return cache[file_path]
+    text = extract_text_from_pdf(file_path)
+    cache[file_path] = text
+    return text
+
+barclays_text = get_cached_pdf_text(barclays_file_path)
+non_financial_text = get_cached_pdf_text(non_financial_file_path)
+
+
+# barclays_text = extract_text_from_pdf(barclays_file_path)
+# non_financial_text = extract_text_from_pdf(non_financial_file_path)
 
 # Navbar definition with additional links
 navbar = html.Nav([
     html.Div([
         html.Strong("ESG", style={"font-weight": "bold", "font-size": "20px", "color": "white", "margin-right": "20px"}),
         html.Ul([
-            html.Li(html.A("Home", href="/", style={"color": "white"})),
-            html.Li(html.A("Scrape", href="/scrape", style={"color": "white"})),
+            html.Li(html.A("Home", href="/home", style={"color": "white"})),
+            html.Li(html.A("Webscraping", href="/webscraping", style={"color": "white"})),
             html.Li(html.A("Sentiment by Theme", href="/sentiment_by_theme", style={"color": "white"})),
             html.Li(html.A("Sentiment by Phrases", href="/sentiment_by_phrases", style={"color": "white"})),
             html.Li(html.A("About", href="/about", style={"color": "white"})),
-            html.Li(html.A("Contact", href="/contact", style={"color": "white"}))
         ], style={"list-style": "none", "display": "flex", "padding": 0, "margin": 0})
     ], style={"display": "flex", "justify-content": "center", "align-items": "center", "height": "50px"})
 ], style={"background-color": "blue", "padding": "10px"})
 
+    # <li><a href="/">Home</a></li>
+    #       <li><a href="/webscraping">Webscraping</a></li>
+    #       <li><a href="/sentiment_by_theme">Sentiment by Theme</a></li>
+    #       <li><a href="/sentiment_by_phrases">Sentiment by Phrases</a></li>
+    #       <li><a href="/topic_modeling">Topic Modeling</a></li>
+    #       <li><a href="/chatbot">Chatbot</a></li>
+
+    #       <li><a href="/about">About</a></li>
+
 # App layout
+# app.layout = html.Div([
+#     dcc.Location(id='url', refresh=False),
+#     navbar,
+#     html.Div(id='page-content'),
+#     html.Hr(),
+# ])
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     navbar,
-    html.Div(id='page-content'),
-    html.Hr(),
+    html.Div(id='page-content')
 ])
 
-# Define a callback to update the page content based on the URL
-@app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
-def display_page(pathname):
-    if pathname == '/about':
-        return html.Div([
-            html.H2("About Page"),
-            html.P("This is the About page content.")
-        ])
-    elif pathname == '/contact':
-        return html.Div([
-            html.H2("Contact Page"),
-            html.P("This is the Contact page content.")
-        ])
-    elif pathname == '/scrape':
-        return html.Div([
-            html.H2("Scrape Data"),
-            html.P("This page will trigger the scraping process.")
-        ])
-    elif pathname == '/sentiment_by_theme':
-        return html.Div([
-            html.H2("Sentiment by Theme"),
-            html.P("This page displays sentiment analysis by theme.")
-        ])
-    elif pathname == '/sentiment_by_phrases':
-        return html.Div([
-            html.H2("Sentiment by Phrases"),
-            html.P("This page displays sentiment analysis by phrases.")
-        ])
-    else:
-        return html.Div([
-            html.H2("Home Page"),
-            html.P("This is the Home page content.")
-        ])
+
+# # Define a callback to update the page content based on the URL
+# @app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
+# def display_page(pathname):
+#     if pathname == '/about':
+#         return html.Div([
+#             html.H2("About Page"),
+#             html.P("This is the About page content.")
+#         ])
+#     elif pathname == '/contact':
+#         return html.Div([
+#             html.H2("Contact Page"),
+#             html.P("This is the Contact page content.")
+#         ])
+#     elif pathname == '/scrape':
+#         return html.Div([
+#             html.H2("Scrape Data"),
+#             html.P("This page will trigger the scraping process.")
+#         ])
+#     elif pathname == '/sentiment_by_theme':
+#         return html.Div([
+#             html.H2("Sentiment by Theme"),
+#             html.P("This page displays sentiment analysis by theme.")
+#         ])
+#     elif pathname == '/sentiment_by_phrases':
+#         return html.Div([
+#             html.H2("Sentiment by Phrases"),
+#             html.P("This page displays sentiment analysis by phrases.")
+#         ])
+#     else:
+#         return html.Div([
+#             html.H2("Home Page"),
+#             html.P("This is the Home page content.")
+#         ])
+
+
+# @app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
+# def display_page(pathname):
+#     if pathname == '/about':
+#         return html.Div([
+#             html.H2("About Page"),
+#             html.P("This is the About page content.")
+#         ])
+#     elif pathname == '/contact':
+#         return html.Div([
+#             html.H2("Contact Page"),
+#             html.P("This is the Contact page content.")
+#         ])
+#     elif pathname == '/webscraping':
+#         return html.Div([
+#             html.H2("Webscraping Page"),
+#             html.P("This page will trigger the scraping process.")
+#         ])
+#     elif pathname == '/sentiment_by_theme':
+#         return html.Div([
+#             html.H2("Sentiment by Theme"),
+#             html.P("This page displays sentiment analysis by theme.")
+#         ])
+#     elif pathname == '/sentiment_by_phrases':
+#         return html.Div([
+#             html.H2("Sentiment by Phrases"),
+#             html.P("This page displays sentiment analysis by phrases.")
+#         ])
+#     else:
+#         return html.Div([
+#             html.H2("Home Page"),
+#             html.P("This is the Home page content.")
+#         ])
+
+@server.route('/about')
+def about():
+    try:
+        return render_template('about.html')
+    except Exception as e:
+        print(f"An error occurred in the about route: {e}")
+        abort(500)  # Internal Server Error
+
+
+@server.route('/home')
+def home():
+    try:
+        return render_template('home.html')
+    except Exception as e:
+        print(f"An error occurred in index route: {e}")
+        abort(500)  # Internal Server Errors
+
 
 # Flask Routes
-@server.route('/scrape')
-def scrape():
+@server.route('/webscraping')
+def webscraping():
     try:
         barclys_data = scrape_data('barclys')
         hbsc_data = scrape_data('hbsc')
@@ -172,7 +281,7 @@ def scrape():
         hbsc_top_words = get_top_words(hbsc_data)
         db_top_words = get_top_words(db_data)
 
-        return render_template('index.html',
+        return render_template('webscraping.html',
                                barclys_wordcloud=barclys_wordcloud,
                                hbsc_wordcloud=hbsc_wordcloud,
                                db_wordcloud=db_wordcloud,
@@ -239,10 +348,53 @@ def sentiment_by_theme():
         print(f"An error occurred in sentiment_by_theme route: {e}")
         abort(500)  # Internal Server Error
 
+def load_sentiments():
+    # Logic to load or compute sentiment data
+    # This is just an example; replace it with your actual implementation
+    return {
+        'ESG innovations in emerging economies': {'polarity': 0.0, 'subjectivity': 0.0},
+        'Diversity inclusion': {'polarity': 0.0, 'subjectivity': 0.5},
+        # Add other phrases and their sentiment data here
+    }
+
+# @server.route('/sentiment_by_phrases')
+# def sentiment_by_phrases():
+#     try:
+#         barclays_phrases_sentiments = analyze_phrase(barclays_file_path, [
+#             'ESG innovations in emerging economies',
+#             'Diversity inclusion',
+#             'ESG performance',
+#             'Human rights',
+#             'Responsible supply chain',
+#             'Climate change',
+#             'ESG disclosures',
+#             'Governance issues',
+#             'Greenhouse gas emissions'
+#         ])
+#         print("Barclays phrases sentiments:", barclays_phrases_sentiments)  # Debugging output
+#         non_financial_phrases_sentiments = analyze_phrase(non_financial_file_path, [
+#             'ESG innovations in emerging economies',
+#             'Diversity inclusion',
+#             'ESG performance',
+#             'Human rights',
+#             'Responsible supply chain',
+#             'Climate change',
+#             'ESG disclosures',
+#             'Governance issues',
+#             'Greenhouse gas emissions'
+#         ])
+#         print("Non-financial phrases sentiments:", non_financial_phrases_sentiments)  # Debugging output
+
+#         # Remaining code...
+#     except Exception as e:
+#         print(f"An error occurred in sentiment_by_phrases route: {e}")
+#         abort(500)  # Internal Server Error
+
+
 @server.route('/sentiment_by_phrases')
 def sentiment_by_phrases():
     try:
-        barclays_phrases_sentiments = analyze_phrase('../backend/files/Barclays-PLC-Annual-Report-2023.pdf', [
+        barclays_phrases_sentiments = analyze_phrase(file_path_barclys, [
             'ESG innovations in emerging economies',
             'Diversity inclusion',
             'ESG performance',
@@ -253,7 +405,7 @@ def sentiment_by_phrases():
             'Governance issues',
             'Greenhouse gas emissions'
         ])
-        non_financial_phrases_sentiments = analyze_phrase('../backend/files/Non-Financial-Report-2023.pdf', [
+        non_financial_phrases_sentiments = analyze_phrase(file_path_db, [
             'ESG innovations in emerging economies',
             'Diversity inclusion',
             'ESG performance',
@@ -275,7 +427,7 @@ def sentiment_by_phrases():
 
         barclays_polarity_chart = create_bar_chart(barclays_labels, barclays_polarity_values, 'Barclays Polarity Scores')
         barclays_subjectivity_chart = create_bar_chart(barclays_labels, barclays_subjectivity_values, 'Barclays Subjectivity Scores')
-        
+
         non_financial_polarity_chart = create_bar_chart(non_financial_labels, non_financial_polarity_values, 'Non-Financial Polarity Scores')
         non_financial_subjectivity_chart = create_bar_chart(non_financial_labels, non_financial_subjectivity_values, 'Non-Financial Subjectivity Scores')
 
@@ -283,10 +435,25 @@ def sentiment_by_phrases():
                                barclays_polarity_chart=barclays_polarity_chart,
                                barclays_subjectivity_chart=barclays_subjectivity_chart,
                                non_financial_polarity_chart=non_financial_polarity_chart,
-                               non_financial_subjectivity_chart=non_financial_subjectivity_chart)
+                               non_financial_subjectivity_chart=non_financial_subjectivity_chart,
+                               barclays_phrases_sentiments=barclays_phrases_sentiments,
+                               non_financial_phrases_sentiments=non_financial_phrases_sentiments)
     except Exception as e:
         print(f"An error occurred in sentiment_by_phrases route: {e}")
         abort(500)  # Internal Server Error
+
+
+# @server.route('/sentiment_by_phrases')
+# def sentiment_by_phrases():
+#     try:
+#         # Example of how you might be loading the data
+#         sentiments = load_sentiments()  # Ensure this function works and returns the expected data
+#         if not sentiments:
+#             raise ValueError('Sentiments data not found.')
+#         return jsonify(sentiments)
+#     except Exception as e:
+#         app.logger.error(f"An error occurred in sentiment_by_phrases route: {e}")
+#         return jsonify({'error': str(e)}), 500
 
 
 def analyze_phrase(file_path, phrases):
@@ -303,7 +470,23 @@ def analyze_phrase(file_path, phrases):
         }
     return phrase_sentiments
 
-# Backend Functions (continued)
+
+# def analyze_phrase(file_path, phrases):
+#     text = extract_text_from_pdf(file_path)
+#     cleaned_text = clean_text(text)
+#     relevant_text = extract_relevant_text(cleaned_text, phrases)
+    
+#     phrase_sentiments = {}
+#     for phrase, snippet in relevant_text.items():
+#         polarity, subjectivity = perform_sentiment_analysis(snippet)
+#         phrase_sentiments[phrase] = {
+#             'polarity': polarity,
+#             'subjectivity': subjectivity
+#         }
+#     return phrase_sentiments
+
+
+# Create a bar chart
 def create_bar_chart(labels, values, title):
     fig, ax = plt.subplots()
     ax.bar(labels, values, color='skyblue')
@@ -317,12 +500,13 @@ def create_bar_chart(labels, values, title):
     plt.close(fig)
     return base64.b64encode(buffer.getvalue()).decode('utf-8')
 
+# Create a word cloud
 def create_wordcloud(text):
+    from wordcloud import WordCloud
     wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
     buffer = BytesIO()
     wordcloud.to_image().save(buffer, format='PNG')
     return base64.b64encode(buffer.getvalue()).decode('utf-8')
-
 def create_pie_chart(labels, values, title):
     fig, ax = plt.subplots()
     ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
@@ -375,8 +559,45 @@ def extract_relevant_text(text, phrases):
 
 def get_sentiment_meaning(polarity, subjectivity):
     polarity_meaning = "Positive" if polarity > 0 else "Negative" if polarity < 0 else "Neutral"
+    subjectivity_measning = "Subjective" if subjectivity > 0.5 else "Objective"
+    return polarity_meaning, subjectivity_meaning
+
+
+def extract_text_from_pdf(file_path):
+    text = ""
+    with open(file_path, "rb") as file:
+        reader = PyPDF2.PdfReader(file)
+        for page_num in range(len(reader.pages)):
+            page = reader.pages[page_num]
+            text += page.extract_text()
+    return text
+
+def clean_text(text):
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    return text.lower()
+
+def get_top_topics(text, n=10):
+    words = [word for word in text.split() if word not in stop_words]
+    word_counts = Counter(words)
+    return word_counts.most_common(n)
+
+def perform_sentiment_analysis(text):
+    blob = TextBlob(text)
+    sentiment = blob.sentiment
+    return sentiment.polarity, sentiment.subjectivity
+
+def analyze_pdf(file_path):
+    text = extract_text_from_pdf(file_path)
+    cleaned_text = clean_text(text)
+    top_topics = get_top_topics(cleaned_text)
+    polarity, subjectivity = perform_sentiment_analysis(cleaned_text)
+    return top_topics, polarity, subjectivity
+def get_sentiment_meaning(polarity, subjectivity):
+    polarity_meaning = "Positive" if polarity > 0 else "Negative" if polarity < 0 else "Neutral"
     subjectivity_meaning = "Subjective" if subjectivity > 0.5 else "Objective"
     return polarity_meaning, subjectivity_meaning
 
+
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)
